@@ -24,14 +24,29 @@ export default function Navbar() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-center">
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-600 dark:text-zinc-300">
-          <Link href="#about" className="transition hover:text-zinc-950 dark:hover:text-white">
-            About Us
+          <Link
+            href="#about"
+            className="transition hover:text-zinc-950 dark:hover:text-white"
+          >
+            About us
           </Link>
-          <Link href="#opportunities" className="transition hover:text-zinc-950 dark:hover:text-white">
-            Opportunities
+          <Link
+            href="#innovation"
+            className="transition hover:text-zinc-950 dark:hover:text-white"
+          >
+            Innovation
           </Link>
-          <Link href="#connections" className="transition hover:text-zinc-950 dark:hover:text-white">
-            Connections
+          <Link
+            href="#training"
+            className="transition hover:text-zinc-950 dark:hover:text-white"
+          >
+            Training
+          </Link>
+          <Link
+            href="#mentorship"
+            className="transition hover:text-zinc-950 dark:hover:text-white"
+          >
+            Mentorship
           </Link>
         </div>
       </div>

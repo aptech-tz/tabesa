@@ -1,14 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const images = [
   "/aboutus/about (1).jpg",
   "/aboutus/about (2).jpg",
   "/aboutus/about (3).jpg",
-  "/aboutus/about (4).jpg",
-  "/aboutus/about (5).jpg",
   "/aboutus/about (6).jpg",
   "/aboutus/about (7).jpg",
   "/aboutus/about (8).jpg",
@@ -72,18 +71,18 @@ export default function About() {
         toward real-world impact.
       </p>
       <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-        <a
-          href="#student"
+        <Link
+          href="/auth?role=student&mode=signup"
           className="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
         >
           Join as Student
-        </a>
-        <a
-          href="#alumni"
+        </Link>
+        <Link
+          href="/auth?role=alumni&mode=signup"
           className="inline-flex w-full max-w-xs items-center justify-center rounded-full border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100 sm:w-auto"
         >
           Join as Alumni
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -100,7 +99,7 @@ export default function About() {
           className={`object-cover transition-opacity duration-700 ${
             currentImage === index ? "opacity-100" : "opacity-0"
           }`}
-          priority={index === 0}
+          preload={index === 0}
         />
       ))}
       <div className="pointer-events-none absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/10 lg:rounded-[2rem]" />
@@ -114,8 +113,8 @@ export default function About() {
           {textBlock}
         </div>
 
-        <div ref={mobileImageTrackRef} className="relative min-h-[720vh]">
-          <div className="sticky top-0 flex min-h-screen items-center px-6 py-16 sm:px-10">
+        <div ref={mobileImageTrackRef} className="relative min-h-[360vh]">
+          <div className="sticky top-20 px-6 py-0 sm:top-16 sm:px-10">
             {imageBlock}
           </div>
         </div>

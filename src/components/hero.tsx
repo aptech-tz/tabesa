@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const firstPhrase = "BME to the Moon";
@@ -93,7 +94,7 @@ export default function Hero() {
         alt="Hero background"
         fill
         className="object-cover"
-        priority
+        preload
       />
       <div className="absolute inset-0 bg-black/50" />
 
@@ -135,18 +136,18 @@ export default function Hero() {
         </p>
 
         <div className="mt-10 flex w-full flex-col items-center justify-center gap-4 sm:flex-row lg:flex-row">
-          <a
-            href="#student"
+          <Link
+            href="/auth?role=student&mode=signup"
             className="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition hover:bg-slate-100 sm:w-auto"
           >
             Join as Student
-          </a>
-          <a
-            href="#alumni"
+          </Link>
+          <Link
+            href="/auth?role=alumni&mode=signup"
             className="inline-flex w-full max-w-xs items-center justify-center rounded-full border border-white/90 bg-white/10 px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/20 sm:w-auto"
           >
             Join as Alumni
-          </a>
+          </Link>
         </div>
       </div>
     </section>

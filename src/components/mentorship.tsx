@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Mentorship() {
   return (
@@ -21,19 +22,19 @@ export default function Mentorship() {
           <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
             Mentorship Program
           </h2>
-          <p className="mt-6 text-base leading-8 text-slate-100 sm:text-lg">
+          <p className="mt-6 text-base leading-7 text-slate-100 sm:text-lg">
             Get connected with experienced mentors who can guide your academic,
             professional, and innovation journey. Whether you want to receive
             support or provide guidance to the next generation of biomedical
             engineers, this program creates space for learning, confidence, and
             meaningful connection.
           </p>
-          <a
-            href="#join-mentorship"
+          <Link
+            href="/auth?role=student&mode=signup"
             className="mt-8 inline-flex w-full max-w-xs items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100 sm:w-auto"
           >
             Join now
-          </a>
+          </Link>
         </div>
       </div>
     </section>

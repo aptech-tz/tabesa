@@ -22,18 +22,18 @@ export default function Footer() {
         alt="TABESA footer background"
         fill
         sizes="100vw"
-        className="scale-105 object-cover opacity-25 blur-sm"
+        className="scale-105 object-cover opacity-55 blur-[2px]"
       />
-      <div className="absolute inset-0 bg-slate-950/80" />
+      <div className="absolute inset-0 bg-slate-950/60" />
 
-      <div className="relative mx-auto max-w-6xl px-6 py-14 sm:px-10">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <div className="relative mx-auto max-w-6xl px-6 py-10 sm:px-10 sm:py-12">
+        <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">TABESA</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
+            <p className="mt-2 text-sm leading-6 text-slate-200">
               Tanzania Biomedical Engineering Students Association
             </p>
-            <p className="mt-4 text-sm leading-7 text-slate-300">
+            <p className="mt-2 text-sm leading-6 text-slate-200">
               Building a connected community for Biomedical Engineering
               students, alumni, mentors, and innovators.
             </p>
@@ -43,7 +43,7 @@ export default function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-200">
               Contacts
             </h3>
-            <div className="mt-5 space-y-3 text-sm leading-7 text-slate-300">
+            <div className="mt-2 space-y-1 text-sm leading-6 text-slate-200">
               <p>Phone: +255 700 000 000</p>
               <p>Email: info@tabesa.or.tz</p>
               <p>Location: MUHAS, Dar es Salaam</p>
@@ -54,7 +54,7 @@ export default function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-200">
               Quick links
             </h3>
-            <nav className="mt-5 flex flex-col gap-3 text-sm text-slate-300">
+            <nav className="mt-2 flex flex-col gap-2 text-sm text-slate-200">
               {quickLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -71,7 +71,7 @@ export default function Footer() {
             <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-200">
               Social media
             </h3>
-            <nav className="mt-5 flex flex-col gap-3 text-sm text-slate-300">
+            <nav className="mt-3 flex flex-col gap-2 text-sm text-slate-200">
               {socialLinks.map((link) => (
                 <Link
                   key={link.label}
@@ -85,7 +85,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/15 pt-6 text-sm text-slate-400">
+        <div className="mt-8 border-t border-white/20 pt-4 text-sm text-slate-300">
           <p>© 2026 TABESA. All rights reserved.</p>
         </div>
       </div>
