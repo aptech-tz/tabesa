@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 
 type AuthMode = "login" | "signup";
@@ -43,6 +44,7 @@ function getInitialRole(): UserRole {
 }
 
 export default function AuthPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<AuthMode>(getInitialMode);
   const [role, setRole] = useState<UserRole>(getInitialRole);
 
@@ -63,6 +65,7 @@ export default function AuthPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    router.push(`/dashboard?role=${role}`);
   };
 
   return (
