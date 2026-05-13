@@ -1,7 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 type UserRole = "student" | "alumni";
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+
+export const metadata: Metadata = {
+  title: "Dashboard | Tabesa",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const profileByRole: Record<
   UserRole,
