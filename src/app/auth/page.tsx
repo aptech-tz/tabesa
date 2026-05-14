@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 type AuthMode = "login" | "signup";
 type UserRole = "student" | "alumni";
@@ -47,6 +48,8 @@ export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>(getInitialMode);
   const [role, setRole] = useState<UserRole>(getInitialRole);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const activeRole = useMemo(
     () => roles.find((option) => option.value === role) ?? roles[0],
@@ -63,9 +66,50 @@ export default function AuthPage() {
       ? `Sign in as ${activeRole.label}`
       : `Sign up as ${activeRole.label}`;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    router.push(`/dashboard?role=${role}`);
+
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+    const fullName = String(formData.get("name") ?? "").trim();
+    const organization = String(formData.get("affiliation") ?? "").trim();
+    const supabase = createClient();
+
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    try {
+      const { error } =
+        mode === "login"
+          ? await supabase.auth.signInWithPassword({
+              email,
+              password,
+            })
+          : await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  full_name: fullName,
+                  role: role.toUpperCase(),
+                  organization,
+                },
+              },
+            });
+
+      if (error) {
+        setErrorMessage(error.message || "Invalid credentials");
+        return;
+      }
+
+      router.push(`/dashboard?role=${role}`);
+      router.refresh();
+    } catch {
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -142,6 +186,12 @@ export default function AuthPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="mt-6 grid gap-4">
+              {errorMessage ? (
+                <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                  {errorMessage}
+                </p>
+              ) : null}
+
               {mode === "signup" ? (
                 <label className="grid gap-2 text-sm font-semibold text-slate-700">
                   Full name
@@ -149,6 +199,7 @@ export default function AuthPage() {
                     type="text"
                     name="name"
                     autoComplete="name"
+                    required={mode === "signup"}
                     className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-normal text-slate-950 outline-none transition focus:border-sky-500 focus:bg-white"
                     placeholder="Enter your full name"
                   />
@@ -161,6 +212,7 @@ export default function AuthPage() {
                   type="email"
                   name="email"
                   autoComplete="email"
+                  required
                   className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-normal text-slate-950 outline-none transition focus:border-sky-500 focus:bg-white"
                   placeholder="you@example.com"
                 />
@@ -174,6 +226,7 @@ export default function AuthPage() {
                   autoComplete={
                     mode === "login" ? "current-password" : "new-password"
                   }
+                  required
                   className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-normal text-slate-950 outline-none transition focus:border-sky-500 focus:bg-white"
                   placeholder="Enter your password"
                 />
@@ -197,9 +250,10 @@ export default function AuthPage() {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="mt-2 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                {submitLabel}
+                {isSubmitting ? "Please wait..." : submitLabel}
               </button>
             </form>
 

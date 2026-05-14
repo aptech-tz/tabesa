@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. USER PROFILES
+model Profile {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  full_name    String?
+  role         String   @default("STUDENT") // STUDENT, ALUMNI, ADMIN
+  bio          String?
+  organization String?  // For Alumni (Company) or Students (Department)
+  
+  // Mentorship connection
+  assigned_mentor_id String? 
+  created_at         DateTime @default(now())
+
+  // Relationships
+  registrations TrainingRegistration[]
+  innovations   StudentInnovation[]
+}
+
+// 2. INNOVATION CHALLENGES (Posted by Admin)
+model Challenge {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  apply_url   String   // The Google Form link you mentioned
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+}
+
+// 3. STUDENT INNOVATIONS (Posted by Students)
+model StudentInnovation {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  author_id   String
+  author      Profile  @relation(fields: [author_id], references: [id])
+  created_at  DateTime @default(now())
+}
+
+// 4. TRAININGS & CONFERENCES (Posted by Admin)
+model Training {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  created_at  DateTime @default(now())
+
+  attendees   TrainingRegistration[]
+}
+
+// This table tracks who registered for what
+model TrainingRegistration {
+  id          String   @id @default(uuid())
+  student_id  String
+  training_id String
+  student     Profile  @relation(fields: [student_id], references: [id])
+  training    Training @relation(fields: [training_id], references: [id])
+}
+
+// 5. ANNOUNCEMENTS & STORIES (The "Update" part)
+model Announcement {
+  id          String   @id @default(uuid())
+  type        String   // SUCCESS_STORY, INDUSTRY_INSIGHT, EVENT_HIGHLIGHT
+  title       String
+  content     String
+  created_at  DateTime @default(now())
+}
+
+// 6. MENTORSHIP APPLICATIONS
+model MentorshipRequest {
+  id          String   @id @default(uuid())
+  user_id     String
+  reason      String
+  status      String   @default("PENDING") // PENDING, MATCHED
+  created_at  DateTime @default(now())
+}
