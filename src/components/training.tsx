@@ -68,9 +68,6 @@ export default function Training() {
     <section id="training" className="bg-white px-6 py-20 text-slate-950 sm:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-700">
-            Training programs
-          </p>
           <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
             Trainings, Workshops and Conferences
           </h2>

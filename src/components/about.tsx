@@ -14,17 +14,26 @@ const images = [
   "/aboutus/about (9).jpg",
 ];
 
+const imageCaptions = [
+  "Teamwork",
+  "Trainings",
+  "Unity",
+  "Seminars",
+  "Mentorship",
+  "Conferences",
+  "Innovation",
+];
+
 export default function About() {
   const desktopTrackRef = useRef<HTMLDivElement>(null);
-  const mobileImageTrackRef = useRef<HTMLDivElement>(null);
   const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
     const updateImage = () => {
       const isLargeScreen = window.matchMedia("(min-width: 1024px)").matches;
-      const track = isLargeScreen
-        ? desktopTrackRef.current
-        : mobileImageTrackRef.current;
+      if (!isLargeScreen) return;
+
+      const track = desktopTrackRef.current;
       if (!track) return;
 
       const rect = track.getBoundingClientRect();
@@ -51,11 +60,38 @@ export default function About() {
     };
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1023px)");
+    let interval: number | undefined;
+
+    const syncMobileRotation = () => {
+      if (interval) {
+        window.clearInterval(interval);
+        interval = undefined;
+      }
+
+      if (mediaQuery.matches) {
+        interval = window.setInterval(() => {
+          setCurrentImage((previousImage) =>
+            previousImage === images.length - 1 ? 0 : previousImage + 1,
+          );
+        }, 3000);
+      }
+    };
+
+    syncMobileRotation();
+    mediaQuery.addEventListener("change", syncMobileRotation);
+
+    return () => {
+      if (interval) {
+        window.clearInterval(interval);
+      }
+      mediaQuery.removeEventListener("change", syncMobileRotation);
+    };
+  }, []);
+
   const textBlock = (
     <div className="text-center lg:text-left">
-      <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-700">
-        About us
-      </p>
       <h2 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
         A home for Biomedical Engineering ambition.
       </h2>
@@ -88,21 +124,26 @@ export default function About() {
   );
 
   const imageBlock = (
-    <div className="relative mx-auto aspect-[16/10] w-full max-w-sm overflow-hidden rounded-[1.5rem] bg-white shadow-2xl shadow-slate-900/15 sm:max-w-md lg:max-w-lg lg:rounded-[2rem]">
-      {images.map((image, index) => (
-        <Image
-          key={image}
-          src={image}
-          alt={`Tabesa community moment ${index + 1}`}
-          fill
-          sizes="(min-width: 1024px) 512px, (min-width: 640px) 448px, calc(100vw - 48px)"
-          className={`object-cover transition-opacity duration-700 ${
-            currentImage === index ? "opacity-100" : "opacity-0"
-          }`}
-          preload={index === 0}
-        />
-      ))}
-      <div className="pointer-events-none absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/10 lg:rounded-[2rem]" />
+    <div>
+      <div className="relative mx-auto aspect-[16/10] w-full max-w-sm overflow-hidden rounded-[1.5rem] bg-white shadow-2xl shadow-slate-900/15 sm:max-w-md lg:max-w-lg lg:rounded-[2rem]">
+        {images.map((image, index) => (
+          <Image
+            key={image}
+            src={image}
+            alt={`Tabesa community moment ${index + 1}`}
+            fill
+            sizes="(min-width: 1024px) 512px, (min-width: 640px) 448px, calc(100vw - 48px)"
+            className={`object-cover transition-opacity duration-700 ${
+              currentImage === index ? "opacity-100" : "opacity-0"
+            }`}
+            preload={index === 0}
+          />
+        ))}
+        <div className="pointer-events-none absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-black/10 lg:rounded-[2rem]" />
+      </div>
+      <p className="mt-5 text-center text-sm font-semibold uppercase tracking-[0.32em] text-sky-700 sm:text-base">
+        {imageCaptions[currentImage]}
+      </p>
     </div>
   );
 
@@ -113,8 +154,8 @@ export default function About() {
           {textBlock}
         </div>
 
-        <div ref={mobileImageTrackRef} className="relative min-h-[360vh]">
-          <div className="sticky top-20 px-6 py-0 sm:top-16 sm:px-10">
+        <div className="relative px-6 pb-12 sm:px-10">
+          <div>
             {imageBlock}
           </div>
         </div>

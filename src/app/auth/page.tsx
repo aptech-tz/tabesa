@@ -8,6 +8,13 @@ import { createClient } from "@/utils/supabase/client";
 type AuthMode = "login" | "signup";
 type UserRole = "student" | "alumni";
 
+type PendingSignupProfile = {
+  email: string;
+  fullName: string;
+  role: string;
+  organization: string;
+};
+
 const roles: Array<{
   value: UserRole;
   label: string;
@@ -44,6 +51,65 @@ function getInitialRole(): UserRole {
   return role === "student" || role === "alumni" ? role : "student";
 }
 
+function getPendingSignupProfile(email: string) {
+  if (typeof window === "undefined") return null;
+
+  const rawProfile = window.localStorage.getItem("tabesa:pending-signup");
+  if (!rawProfile) return null;
+
+  try {
+    const profile = JSON.parse(rawProfile) as PendingSignupProfile;
+    return profile.email.toLowerCase() === email.toLowerCase() ? profile : null;
+  } catch {
+    window.localStorage.removeItem("tabesa:pending-signup");
+    return null;
+  }
+}
+
+function savePendingSignupProfile(profile: PendingSignupProfile) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.setItem("tabesa:pending-signup", JSON.stringify(profile));
+}
+
+function clearPendingSignupProfile() {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.removeItem("tabesa:pending-signup");
+}
+
+async function syncProfile({
+  accessToken,
+  mode,
+  fullName,
+  role,
+  organization,
+}: {
+  accessToken: string;
+  mode: AuthMode;
+  fullName?: string;
+  role?: string;
+  organization?: string;
+}) {
+  const response = await fetch("/api/profiles", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      mode,
+      fullName,
+      role,
+      organization,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Profile could not be saved.");
+  }
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>(getInitialMode);
@@ -58,13 +124,11 @@ export default function AuthPage() {
 
   const heading =
     mode === "login"
-      ? `Sign in as ${activeRole.label}`
+      ? "Sign in to your account"
       : `Create ${activeRole.label} account`;
 
   const submitLabel =
-    mode === "login"
-      ? `Sign in as ${activeRole.label}`
-      : `Sign up as ${activeRole.label}`;
+    mode === "login" ? "Sign in" : `Sign up as ${activeRole.label}`;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -80,12 +144,9 @@ export default function AuthPage() {
     setIsSubmitting(true);
 
     try {
-      const { error } =
+      const authResult =
         mode === "login"
-          ? await supabase.auth.signInWithPassword({
-              email,
-              password,
-            })
+          ? await supabase.auth.signInWithPassword({ email, password })
           : await supabase.auth.signUp({
               email,
               password,
@@ -98,12 +159,61 @@ export default function AuthPage() {
               },
             });
 
-      if (error) {
-        setErrorMessage(error.message || "Invalid credentials");
+      if (authResult.error) {
+        setErrorMessage(authResult.error.message || "Invalid credentials");
         return;
       }
 
-      router.push(`/dashboard?role=${role}`);
+      if (mode === "signup") {
+        savePendingSignupProfile({
+          email,
+          fullName: fullName || email,
+          role: role.toUpperCase(),
+          organization,
+        });
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      let activeSession = authResult.data.session ?? session;
+      let activeUser = authResult.data.user ?? activeSession?.user;
+
+      if (mode === "signup" && !activeSession?.access_token) {
+        const signInResult = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (!signInResult.error) {
+          activeSession = signInResult.data.session;
+          activeUser = signInResult.data.user ?? activeSession?.user;
+        }
+      }
+
+      if (!activeSession?.access_token || !activeUser) {
+        setMode("login");
+        setErrorMessage(
+          "Check your email to confirm the account, then sign in here.",
+        );
+        return;
+      }
+
+      const pendingProfile =
+        mode === "login" ? getPendingSignupProfile(email) : null;
+
+      await syncProfile({
+        accessToken: activeSession.access_token,
+        mode,
+        fullName:
+          mode === "signup" ? fullName || email : pendingProfile?.fullName,
+        role: mode === "signup" ? role.toUpperCase() : pendingProfile?.role,
+        organization:
+          mode === "signup" ? organization : pendingProfile?.organization,
+      });
+
+      clearPendingSignupProfile();
+      router.push("/dashboard");
       router.refresh();
     } catch {
       setErrorMessage("Something went wrong. Please try again.");
@@ -137,25 +247,29 @@ export default function AuthPage() {
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:max-w-xl">
-              {roles.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setRole(option.value)}
-                  className={`rounded-[1.25rem] border p-4 text-left transition ${
-                    role === option.value
-                      ? "border-sky-500 bg-sky-50 shadow-sm shadow-sky-900/10"
-                      : "border-slate-200 bg-white hover:border-slate-300"
-                  }`}
-                >
-                  <span className="text-base font-semibold">{option.label}</span>
-                  <span className="mt-2 block text-sm leading-6 text-slate-600">
-                    {option.description}
-                  </span>
-                </button>
-              ))}
-            </div>
+            {mode === "signup" ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:max-w-xl">
+                {roles.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setRole(option.value)}
+                    className={`rounded-[1.25rem] border p-4 text-left transition ${
+                      role === option.value
+                        ? "border-sky-500 bg-sky-50 shadow-sm shadow-sky-900/10"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <span className="text-base font-semibold">
+                      {option.label}
+                    </span>
+                    <span className="mt-2 block text-sm leading-6 text-slate-600">
+                      {option.description}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </section>
 
           <section className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/10 sm:p-6">
@@ -177,9 +291,11 @@ export default function AuthPage() {
             </div>
 
             <div className="mt-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-700">
-                {activeRole.label} services
-              </p>
+              {mode === "signup" ? (
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-700">
+                  {activeRole.label} services
+                </p>
+              ) : null}
               <h2 className="mt-2 text-3xl font-semibold tracking-tight">
                 {heading}
               </h2>
@@ -267,13 +383,17 @@ export default function AuthPage() {
                   ? "Need an account? Sign up"
                   : "Already registered? Sign in"}
               </button>
-              <button
-                type="button"
-                onClick={() => setRole(role === "student" ? "alumni" : "student")}
-                className="font-semibold text-slate-800 transition hover:text-slate-950"
-              >
-                Switch to {role === "student" ? "Alumni" : "Student"}
-              </button>
+              {mode === "signup" ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRole(role === "student" ? "alumni" : "student")
+                  }
+                  className="font-semibold text-slate-800 transition hover:text-slate-950"
+                >
+                  Switch to {role === "student" ? "Alumni" : "Student"}
+                </button>
+              ) : null}
             </div>
           </section>
         </div>

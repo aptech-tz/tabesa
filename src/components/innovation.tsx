@@ -41,9 +41,6 @@ export default function Innovation() {
     <section id="innovation" className="bg-white px-6 py-20 text-slate-950 sm:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-700">
-            Innovation hub
-          </p>
           <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
             Innovation Hub
           </h2>
