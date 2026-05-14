@@ -16,9 +16,6 @@ export default function Mentorship() {
 
       <div className="relative mx-auto flex min-h-[34rem] max-w-6xl items-center px-6 py-20 sm:px-10 lg:min-h-[40rem]">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-200">
-            Guided growth
-          </p>
           <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
             Mentorship Program
           </h2>
