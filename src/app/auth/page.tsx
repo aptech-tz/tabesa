@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
@@ -37,17 +37,13 @@ const modes: Array<{ value: AuthMode; label: string }> = [
   { value: "signup", label: "Sign up" },
 ];
 
-function getInitialMode(): AuthMode {
-  if (typeof window === "undefined") return "signup";
-
-  const mode = new URLSearchParams(window.location.search).get("mode");
+function getModeFromSearchParams(searchParams: URLSearchParams | ReadonlyURLSearchParams): AuthMode {
+  const mode = searchParams.get("mode");
   return mode === "login" || mode === "signup" ? mode : "signup";
 }
 
-function getInitialRole(): UserRole {
-  if (typeof window === "undefined") return "student";
-
-  const role = new URLSearchParams(window.location.search).get("role");
+function getRoleFromSearchParams(searchParams: URLSearchParams | ReadonlyURLSearchParams): UserRole {
+  const role = searchParams.get("role");
   return role === "student" || role === "alumni" ? role : "student";
 }
 
@@ -112,8 +108,13 @@ async function syncProfile({
 
 export default function AuthPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<AuthMode>(getInitialMode);
-  const [role, setRole] = useState<UserRole>(getInitialRole);
+  const searchParams = useSearchParams();
+  const [mode, setMode] = useState<AuthMode>(() =>
+    getModeFromSearchParams(searchParams),
+  );
+  const [role, setRole] = useState<UserRole>(() =>
+    getRoleFromSearchParams(searchParams),
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

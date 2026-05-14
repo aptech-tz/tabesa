@@ -38,28 +38,13 @@ function LocationIcon() {
 
 const trainings = [
   {
-    title: "Biomedical Innovation Workshop",
+    title: "BME Connect Summit",
+    image: "/connectsummit.jpg",
     description:
-      "A practical session for students to explore prototyping, clinical problem solving, and healthcare technology design.",
-    date: "18 June 2026",
-    time: "9:00 AM - 1:00 PM",
-    location: "College of Health Sciences, Dar es Salaam",
-  },
-  {
-    title: "Medical Equipment Training",
-    description:
-      "Hands-on training focused on equipment safety, preventive maintenance, and real hospital engineering workflows.",
-    date: "25 July 2026",
-    time: "10:00 AM - 3:00 PM",
-    location: "Muhimbili Biomedical Engineering Lab",
-  },
-  {
-    title: "BME Students Conference",
-    description:
-      "A community gathering for presentations, networking, and conversations around the future of biomedical engineering.",
-    date: "14 August 2026",
-    time: "8:30 AM - 5:00 PM",
-    location: "Julius Nyerere International Convention Centre",
+      "BME Connect Summit brings biomedical students, innovators, and industry partners together through exhibitions, networking, training, and collaboration.",
+    date: "16 May 2026",
+    time: "8:00 AM - 6:00 PM",
+    location: "Golden View Social Hall",
   },
 ];
 
@@ -86,7 +71,7 @@ export default function Training() {
             >
               <div className="relative aspect-[16/9] overflow-hidden rounded-[1rem] transition-opacity duration-500 group-hover:opacity-0">
                 <Image
-                  src="/training.jpg"
+                  src={training.image}
                   alt={training.title}
                   fill
                   sizes="(min-width: 1024px) 33vw, calc(100vw - 48px)"
@@ -95,7 +80,7 @@ export default function Training() {
               </div>
               <div className="absolute inset-2.5 overflow-hidden rounded-[1rem] opacity-0 transition-opacity duration-500 group-hover:opacity-100">
                 <Image
-                  src="/training.jpg"
+                  src={training.image}
                   alt=""
                   fill
                   sizes="(min-width: 1024px) 33vw, calc(100vw - 48px)"
