@@ -15,6 +15,10 @@ type PendingSignupProfile = {
   organization: string;
 };
 
+type SearchParamsLike = {
+  get(name: string): string | null;
+};
+
 const roles: Array<{
   value: UserRole;
   label: string;
@@ -37,12 +41,12 @@ const modes: Array<{ value: AuthMode; label: string }> = [
   { value: "signup", label: "Sign up" },
 ];
 
-function getModeFromSearchParams(searchParams: URLSearchParams | ReadonlyURLSearchParams): AuthMode {
+function getModeFromSearchParams(searchParams: SearchParamsLike): AuthMode {
   const mode = searchParams.get("mode");
   return mode === "login" || mode === "signup" ? mode : "signup";
 }
 
-function getRoleFromSearchParams(searchParams: URLSearchParams | ReadonlyURLSearchParams): UserRole {
+function getRoleFromSearchParams(searchParams: SearchParamsLike): UserRole {
   const role = searchParams.get("role");
   return role === "student" || role === "alumni" ? role : "student";
 }
