@@ -2,37 +2,45 @@ import Image from "next/image";
 
 const innovations = [
   {
-    title: "Student Device Showcase",
+    title: "Bilimeasure",
+    student: "Abubakar Mathias",
+    university: "Muhas",
+    image: "/bilimeasure.jpeg",
     description:
-      "A practical prototype built to help healthcare teams monitor essential biomedical equipment with better confidence.",
+      "A biomedical innovation device that helps to measure bilirubin level to jaundiced neonates non-invasively.",
   },
   {
-    title: "Clinical Ideas Lab",
+    title: "Autostainer",
+    student: "Innocent Tesha",
+    university: "Muhas",
+    image: "/autostainer.png",
     description:
-      "A fresh concept focused on turning classroom research into useful tools for hospitals, labs, and training spaces.",
+      "A laboratory innovation device that automates the staining process for laboratory technicians in order to save time.",
   },
   {
-    title: "Community Health Prototype",
+    title: "Wireless Temperature and heartrate measure",
+    student: "Amina S. Juma",
+    university: "DIT",
+    image: "/wirelessInnovation.jpg",
     description:
-      "An early-stage innovation designed to support accessible care through thoughtful engineering and student collaboration.",
+      "An early-stage innovation that helps nurses to measure temperature and heartrate of their patients in ward from their nursing station.",
   },
 ];
 
 const challenges = [
   {
-    title: "Biomedical Design Sprint",
+    title: "Chia Innovation Awards",
     description:
-      "Develop practical solutions for real clinical needs through fast prototyping, teamwork, and expert feedback.",
+      "Looking fund for your idea? Submit your innovative idea to win 5 Million Tanzania Shillings",
+    image: "/TanzaniaHealthSummit.jpg",
+    link: "https://ths.or.tz/chia-form/",
   },
   {
-    title: "Health Technology Pitch",
+    title: "Win and Learn",
     description:
-      "Present bold ideas that improve patient care, hospital workflows, or community health access.",
-  },
-  {
-    title: "Research to Impact Challenge",
-    description:
-      "Transform academic research into usable products, services, or systems that can support healthcare delivery.",
+      "Present bold ideas that improve patient care, hospital workflows, or community health access at win and learn event.",
+    image: "/win&Learn.jpg",
+    link: "https://docs.google.com/forms/d/e/1FAIpQLSdc9aCDt1tG5MsljzhJ8y2qgQB4rrd6Ktflo_9GrKavFf8d8w/viewform?pli=1",
   },
 ];
 
@@ -64,7 +72,7 @@ export default function Innovation() {
               >
                 <div className="absolute inset-x-0 top-0 h-56 overflow-hidden transition-all duration-500 ease-out group-hover:h-full">
                   <Image
-                    src="/innovation.jpg"
+                    src={innovation.image}
                     alt={innovation.title}
                     fill
                     sizes="(min-width: 768px) 33vw, calc(100vw - 48px)"
@@ -77,6 +85,12 @@ export default function Innovation() {
                   <h4 className="text-xl font-semibold text-slate-950 transition-colors duration-500 group-hover:text-white">
                     {innovation.title}
                   </h4>
+                  <p className="mt-2 text-sm font-semibold text-sky-700 transition-colors duration-500 group-hover:text-sky-200">
+                    {innovation.student}
+                  </p>
+                  <p className="text-sm text-slate-500 transition-colors duration-500 group-hover:text-slate-200">
+                    {innovation.university}
+                  </p>
                   <p className="mt-4 text-base leading-7 text-slate-600 transition-colors duration-500 group-hover:text-slate-100">
                     {innovation.description}
                   </p>
@@ -98,22 +112,29 @@ export default function Innovation() {
                 className="group relative min-h-[26rem] overflow-hidden rounded-[1.25rem] shadow-sm"
               >
                 <Image
-                  src="/innovationChallenge.jpg"
+                  src={challenge.image}
                   alt={challenge.title}
                   fill
                   sizes="(min-width: 768px) 33vw, calc(100vw - 48px)"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-950/5" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-50/90 via-slate-50/70 to-slate-50/10" />
 
-                <div className="relative z-10 flex min-h-[26rem] flex-col justify-end p-6 text-white">
+                <div className="relative z-10 flex min-h-[26rem] flex-col justify-end p-6 text-slate-950">
                   <h4 className="text-2xl font-semibold leading-tight">
                     {challenge.title}
                   </h4>
-                  <p className="mt-4 text-base leading-7 text-slate-100">
+                  <p className="mt-4 text-base leading-7 text-slate-700">
                     {challenge.description}
                   </p>
                 </div>
+
+                <a
+                  href={challenge.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 z-20"
+                />
               </article>
             ))}
           </div>
@@ -121,7 +142,7 @@ export default function Innovation() {
 
         <div className="mt-14 flex justify-center">
           <a
-            href="#upload-innovation"
+            href="/auth?mode=login"
             className="inline-flex w-full max-w-xs items-center justify-center rounded-full bg-slate-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
           >
             Upload your Innovation
