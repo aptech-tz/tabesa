@@ -10,7 +10,7 @@ const innovations = [
       "A biomedical innovation device that helps to measure bilirubin level to jaundiced neonates non-invasively.",
   },
   {
-    title: "Autostainer",
+    title: "autostainer",
     student: "Innocent Tesha",
     university: "Muhas",
     image: "/autostainer.png",
