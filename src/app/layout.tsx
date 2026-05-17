@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tabesa",
   description: "Tanzania Biomedical Engineering Students' Association",
+  icons: {
+    icon: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({

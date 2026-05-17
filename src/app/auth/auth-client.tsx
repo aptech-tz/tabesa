@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 type AuthMode = "login" | "signup";
@@ -119,6 +120,7 @@ export default function AuthPageClient() {
   const [role, setRole] = useState<UserRole>(() =>
     getRoleFromSearchParams(searchParams),
   );
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -178,10 +180,14 @@ export default function AuthPageClient() {
         });
       }
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      let activeSession = authResult.data.session ?? session;
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+      let activeSession = authResult.data.session ?? sessionData?.session;
       let activeUser = authResult.data.user ?? activeSession?.user;
 
       if (mode === "signup" && !activeSession?.access_token) {
@@ -211,17 +217,28 @@ export default function AuthPageClient() {
         accessToken: activeSession.access_token,
         mode,
         fullName:
-          mode === "signup" ? fullName || email : pendingProfile?.fullName,
-        role: mode === "signup" ? role.toUpperCase() : pendingProfile?.role,
+          mode === "signup"
+            ? fullName || email
+            : pendingProfile?.fullName,
+        role:
+          mode === "signup"
+            ? role.toUpperCase()
+            : pendingProfile?.role,
         organization:
-          mode === "signup" ? organization : pendingProfile?.organization,
+          mode === "signup"
+            ? organization
+            : pendingProfile?.organization,
       });
 
       clearPendingSignupProfile();
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setErrorMessage("Something went wrong. Please try again.");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.";
+      setErrorMessage(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -307,12 +324,26 @@ export default function AuthPageClient() {
 
                 <label className="block text-sm font-semibold text-slate-900">
                   Password
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    className="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-sky-700 focus:ring-2 focus:ring-sky-100"
-                  />
+                  <div className="relative mt-2">
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm text-slate-950 outline-none transition focus:border-sky-700 focus:ring-2 focus:ring-sky-100"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 transition hover:text-slate-900"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
+                    </button>
+                  </div>
                 </label>
 
                 {mode === "signup" ? (
@@ -341,7 +372,14 @@ export default function AuthPageClient() {
               </div>
 
               {errorMessage ? (
-                <div className="rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                <div
+                  className={`rounded-3xl p-4 text-sm ${
+                    errorMessage ===
+                    "Check your email to confirm the account, then sign in here."
+                      ? "border border-sky-200 bg-sky-50 text-sky-900"
+                      : "border border-red-200 bg-red-50 text-red-800"
+                  }`}
+                >
                   {errorMessage}
                 </div>
               ) : null}
