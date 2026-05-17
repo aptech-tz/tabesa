@@ -9,13 +9,17 @@ type ProfileRequestBody = {
 };
 
 function normalizeRole(role: unknown) {
-  const normalizedRole = String(role ?? "").toUpperCase();
+  if (typeof role !== "string") {
+    return undefined;
+  }
+
+  const normalizedRole = role.toUpperCase();
 
   if (normalizedRole === "STUDENT" || normalizedRole === "ALUMNI") {
     return normalizedRole;
   }
 
-  return "STUDENT";
+  return undefined;
 }
 
 export async function POST(request: Request) {
@@ -49,7 +53,9 @@ export async function POST(request: Request) {
     String(body.fullName ?? metadata.full_name ?? "").trim() || null;
   const organization =
     String(body.organization ?? metadata.organization ?? "").trim() || null;
-  const role = normalizeRole(body.role ?? metadata.role);
+  const role = normalizeRole(
+    body.role ?? metadata.role ?? undefined,
+  );
 
   const existingProfile = await prisma.profile.findUnique({
     where: {
@@ -64,64 +70,61 @@ export async function POST(request: Request) {
     },
   });
 
-  if (existingProfile && mode === "login") {
-    const profile =
-      existingProfile.email === user.email
-        ? existingProfile
-        : await prisma.profile.update({
-            where: {
-              id: user.id,
-            },
-            data: {
-              email: user.email,
-            },
-            select: {
-              id: true,
-              email: true,
-              full_name: true,
-              role: true,
-              organization: true,
-            },
-          });
+  if (existingProfile) {
+    const updateData: {
+      email: string;
+      full_name?: string | null;
+      role?: string;
+      organization?: string | null;
+    } = {
+      email: user.email,
+    };
+
+    if (fullName !== null) {
+      updateData.full_name = fullName;
+    }
+
+    if (organization !== null) {
+      updateData.organization = organization;
+    }
+
+    if (role) {
+      updateData.role = role;
+    }
+
+    const profile = await prisma.profile.update({
+      where: {
+        id: user.id,
+      },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        full_name: true,
+        role: true,
+        organization: true,
+      },
+    });
 
     return Response.json({ profile });
   }
 
-  const profile = existingProfile
-    ? await prisma.profile.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          email: user.email,
-          full_name: fullName,
-          role,
-          organization,
-        },
-        select: {
-          id: true,
-          email: true,
-          full_name: true,
-          role: true,
-          organization: true,
-        },
-      })
-    : await prisma.profile.create({
-        data: {
-          id: user.id,
-          email: user.email,
-          full_name: fullName,
-          role,
-          organization,
-        },
-        select: {
-          id: true,
-          email: true,
-          full_name: true,
-          role: true,
-          organization: true,
-        },
-      });
+  const profile = await prisma.profile.create({
+    data: {
+      id: user.id,
+      email: user.email,
+      ...(fullName ? { full_name: fullName } : {}),
+      role,
+      ...(organization ? { organization } : {}),
+    },
+    select: {
+      id: true,
+      email: true,
+      full_name: true,
+      role: true,
+      organization: true,
+    },
+  });
 
   return Response.json({ profile });
 }
