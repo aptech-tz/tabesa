@@ -37,10 +37,8 @@ const roles: Array<{
   },
 ];
 
-const modes: Array<{ value: AuthMode; label: string }> = [
-  { value: "login", label: "Sign in" },
-  { value: "signup", label: "Sign up" },
-];
+const confirmEmailMessage =
+  "Check your email to confirm the account, then sign in here.";
 
 function getModeFromSearchParams(searchParams: SearchParamsLike): AuthMode {
   const mode = searchParams.get("mode");
@@ -178,6 +176,12 @@ export default function AuthPageClient() {
           role: role.toUpperCase(),
           organization,
         });
+
+        if (!authResult.data.session?.access_token) {
+          setMode("login");
+          setErrorMessage(confirmEmailMessage);
+          return;
+        }
       }
 
       const { data: sessionData, error: sessionError } =
@@ -204,9 +208,7 @@ export default function AuthPageClient() {
 
       if (!activeSession?.access_token || !activeUser) {
         setMode("login");
-        setErrorMessage(
-          "Check your email to confirm the account, then sign in here.",
-        );
+        setErrorMessage(confirmEmailMessage);
         return;
       }
 
@@ -374,8 +376,7 @@ export default function AuthPageClient() {
               {errorMessage ? (
                 <div
                   className={`rounded-3xl p-4 text-sm ${
-                    errorMessage ===
-                    "Check your email to confirm the account, then sign in here."
+                    errorMessage === confirmEmailMessage
                       ? "border border-sky-200 bg-sky-50 text-sky-900"
                       : "border border-red-200 bg-red-50 text-red-800"
                   }`}
@@ -389,7 +390,7 @@ export default function AuthPageClient() {
                 disabled={isSubmitting}
                 className="w-full rounded-3xl bg-sky-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {isSubmitting ? "Working…" : submitLabel}
+                {isSubmitting ? "Working..." : submitLabel}
               </button>
 
               <div className="flex items-center justify-between text-sm text-slate-600">
